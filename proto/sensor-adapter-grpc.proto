@@ -1,0 +1,25 @@
+syntax = "proto3";
+package sensor_adapter_grpc;
+
+service SensorAdapter {
+    // Send Sensor Data
+    rpc SendSensorData (SensorDataRequest) returns (SensorAdapterReply);
+}
+
+message SensorDataRequest {
+    // Request message for Sensor Data
+    string sensor_id = 1;
+    string name = 2;
+    string sensor_type = 3;
+    string value = 4;
+    string unit = 5;
+    int64 timestamp = 6;
+    string command = 7;
+}
+
+message SensorAdapterReply {
+    // Reply message from Sensor
+    string status = 1;
+    string command = 2;
+    string payload = 3;
+}
