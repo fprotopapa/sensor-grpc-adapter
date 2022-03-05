@@ -1,7 +1,7 @@
-# rust-mqtt-service
+# sensor-grpc-adapter
 
-Rust Service to interact with MQTT Broker. 
-Communication over GRPC and MQTT. This repository has Server and Client implementation.
+Rust Adapter to interact with sensor implementation via GRPC. 
+Sensor data is send over GRPC Endpoint. 
 
 ## Build
 
