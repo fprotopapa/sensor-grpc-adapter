@@ -32,18 +32,13 @@ pub struct SensorReply {
 /// Structure for Implementing GRPC Calls
 #[derive(Debug)]
 pub struct SensorAdapterService {
-    tx: mpsc::Sender<ServerSensorChannel>,
-    rx: mpsc::Receiver<ServerSensorChannel>,
+    pub tx: mpsc::Sender<ServerSensorChannel>,
 }
 
 impl SensorAdapterService {
-    pub fn new() -> SensorAdapterService {
-        let (tx, rx) = mpsc::channel::<ServerSensorChannel>(32);
-        SensorAdapterService { tx: tx, rx: rx }
-    }
-
-    pub fn get_receiver(self) -> mpsc::Receiver<ServerSensorChannel> {
-        self.rx
+    pub fn new(buffer_size: usize) -> (SensorAdapterService, mpsc::Receiver<ServerSensorChannel>) {
+        let (tx, rx) = mpsc::channel::<ServerSensorChannel>(buffer_size);
+        (SensorAdapterService { tx: tx }, rx)
     }
 }
 /// Implementation of GRPC Calls
