@@ -9,11 +9,13 @@ pub mod grpc_sensor {
     tonic::include_proto!("sensor_adapter_grpc");
 }
 
+#[derive(Debug)]
 pub struct ServerSensorChannel {
     pub data: SensorData,
     pub tx: oneshot::Sender<SensorReply>,
 }
 
+#[derive(Debug)]
 pub struct SensorData {
     pub sensor_id: String,
     pub name: String,
@@ -24,6 +26,7 @@ pub struct SensorData {
     pub command: String,
 }
 
+#[derive(Debug)]
 pub struct SensorReply {
     pub status: String,
     pub command: String,
