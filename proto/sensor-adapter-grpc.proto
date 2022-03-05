@@ -13,7 +13,7 @@ message SensorDataRequest {
     string sensor_type = 3;
     string value = 4;
     string unit = 5;
-    int64 timestamp = 6;
+    uint64 timestamp = 6;
     string command = 7;
 }
 

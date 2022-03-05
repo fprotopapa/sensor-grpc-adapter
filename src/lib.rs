@@ -23,7 +23,7 @@ pub struct SensorData {
     pub sensor_type: String,
     pub value: String,
     pub unit: String,
-    pub timestamp: i64,
+    pub timestamp: u64,
     pub command: String,
 }
 /// Struct to Return Information to Sensor Implementation
