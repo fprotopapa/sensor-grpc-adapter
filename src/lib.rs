@@ -1,6 +1,7 @@
 use grpc_sensor::sensor_adapter_client::SensorAdapterClient;
 use grpc_sensor::sensor_adapter_server::{SensorAdapter, SensorAdapterServer};
 use grpc_sensor::{SensorAdapterReply, SensorDataRequest};
+
 use tokio::sync::{mpsc, oneshot};
 use tonic::transport::{Channel, Server};
 use tonic::{Request, Response, Status};
@@ -8,13 +9,13 @@ use tonic::{Request, Response, Status};
 pub mod grpc_sensor {
     tonic::include_proto!("sensor_adapter_grpc");
 }
-
+/// Struct for Communication between External Implementation and GRPC Server
 #[derive(Debug)]
 pub struct ServerSensorChannel {
     pub data: SensorData,
     pub tx: oneshot::Sender<SensorReply>,
 }
-
+/// Struct to Exchange Sensor Information and Data with External Implementation
 #[derive(Debug)]
 pub struct SensorData {
     pub sensor_id: String,
@@ -25,7 +26,8 @@ pub struct SensorData {
     pub timestamp: i64,
     pub command: String,
 }
-
+/// Struct to Return Information to Sensor Implementation
+/// Can be Used to Execute Commands
 #[derive(Debug)]
 pub struct SensorReply {
     pub status: String,
@@ -33,11 +35,15 @@ pub struct SensorReply {
     pub payload: String,
 }
 /// Structure for Implementing GRPC Calls
+/// Holds Channel MPSC to Communicate with Calling Implementation
+/// Channel Sends ServerSensorChannel Structure containing Sensor Data and Response Channel
 #[derive(Debug)]
 pub struct SensorAdapterService {
     pub tx: mpsc::Sender<ServerSensorChannel>,
 }
-
+/// Initialization of GRPC Service
+/// Buffer Size of MPSC Channel
+/// Returns initialized SensorAdapterService and Receiving End of MPSC Channel
 impl SensorAdapterService {
     pub fn new(buffer_size: usize) -> (SensorAdapterService, mpsc::Receiver<ServerSensorChannel>) {
         let (tx, rx) = mpsc::channel::<ServerSensorChannel>(buffer_size);
@@ -45,7 +51,7 @@ impl SensorAdapterService {
     }
 }
 /// Implementation of GRPC Calls
-/// send_sensor_data, send_command
+/// send_sensor_data
 #[tonic::async_trait]
 impl SensorAdapter for SensorAdapterService {
     async fn send_sensor_data(
@@ -81,7 +87,8 @@ impl SensorAdapter for SensorAdapterService {
         }))
     }
 }
-
+/// Start GRPC Server
+/// Takes Initialized SensorAdapterService and Socket e.g. \"[::1]:50051"
 pub async fn run_sensor_adapter_server(
     service: SensorAdapterService,
     socket: &str,
@@ -94,14 +101,18 @@ pub async fn run_sensor_adapter_server(
         .await?;
     Ok(())
 }
-
+/// Create GRPC Client
+/// Takes Socket e.g. \"[::1]:50051"
+/// Returns SensorAdapterClient<Channel> or Error
 pub async fn connect_sensor_adapter_client(
     socket: &str,
 ) -> Result<SensorAdapterClient<Channel>, Box<dyn std::error::Error>> {
     let client = SensorAdapterClient::connect(format!("http://{}", socket)).await?;
     Ok(client)
 }
-
+/// Client Call to Send Sensor Data
+/// Takes Client and SensorData Struct
+/// Returns SensorReply Struct or Error
 pub async fn send_sensor_data(
     client: &mut SensorAdapterClient<Channel>,
     data: SensorData,
